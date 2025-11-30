@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="WixSharp_wix4" Version="2.12.0" />
+      <PackageReference Include="WixSharp_wix4.bin" Version="2.12.0" />
+    </ItemGroup>
+
+</Project>
