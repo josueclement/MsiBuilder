@@ -123,14 +123,14 @@ public class WixMsiBuilder(string appName)
     /// Configures the managed user interface for the installer.
     /// </summary>
     /// <param name="wui">The WixSharp UI type to use</param>
-    /// <param name="configure">An action to configure the managed UI dialogs</param>
+    /// <param name="ui">An action to configure the managed UI dialogs</param>
     /// <returns>The builder instance for method chaining</returns>
     // ReSharper disable once MemberCanBePrivate.Global
-    public WixMsiBuilder SetManagedUi(WUI wui, Action<IManagedUI> configure)
+    public WixMsiBuilder SetManagedUi(WUI wui, Action<IManagedUI> ui)
     {
         _project.UI = wui;
         _project.ManagedUI = new ManagedUI();
-        configure(_project.ManagedUI);
+        ui(_project.ManagedUI);
         _managedUiSet = true;
         return this;
     }
