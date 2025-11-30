@@ -1,10 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <OutputType>Library</OutputType>
         <TargetFramework>net472</TargetFramework>
         <Nullable>enable</Nullable>
         <LangVersion>14</LangVersion>
+        <Authors>Josué Clément</Authors>
+        <Copyright>Copyright © 2025 Josué Clément</Copyright>
+        <PackageId>MsiBuilder</PackageId>
+        <Title>MSI builder library</Title>
+        <Version>1.0.0</Version>
+        <Description>MSI builder based on WixSharp</Description>
+        <PackageTags>msi builder wix open-source</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+        <PackageProjectUrl>https://github.com/josueclement/MsiBuilder</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/josueclement/MsiBuilder</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <IncludeSymbols>True</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\LICENSE.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="WixSharp_wix4" Version="2.12.0" />

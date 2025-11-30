@@ -46,6 +46,5 @@ static class Program
             Console.WriteLine($"Installer created at {path}");
         else
             Console.WriteLine($"Error building installer: {message}");
-        
     }
 }

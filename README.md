@@ -6,6 +6,8 @@ Provides a fluent API for configuring and building MSI installers with various o
 
 ## Install wix tool
 
+The wix tool is required to build MSI packages with this library.
+
 ```bash
 dotnet tool install --global wix
 ```
@@ -51,3 +53,7 @@ if (success)
 else
     Console.WriteLine($"Error building installer: {message}");
 ```
+
+---
+
+Copyright (c) 2025 Josué Clément
