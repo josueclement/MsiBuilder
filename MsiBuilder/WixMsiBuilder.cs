@@ -12,7 +12,6 @@ namespace MsiBuilder;
 /// </summary>
 public class WixMsiBuilder(string appName)
 {
-    //dotnet tool install --global wix
     private readonly ManagedProject _project = new(appName);
     private bool _installDirSet;
     private bool _installScopeSet;
