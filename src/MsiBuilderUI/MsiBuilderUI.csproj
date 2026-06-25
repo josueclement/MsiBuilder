@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="12.0.5" />
+        <PackageReference Include="Avalonia.Desktop" Version="12.0.5" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.5" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.5" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\MsiBuilder.Contracts\MsiBuilder.Contracts.csproj" />
+        <!-- Build-order dependency on the net472 worker. ReferenceOutputAssembly=false because a net10 project
+             cannot consume a net472 assembly; SkipGetTargetFrameworkProperties skips the TFM-compat check. -->
+        <ProjectReference Include="..\MsiBuilder.Worker\MsiBuilder.Worker.csproj"
+                          ReferenceOutputAssembly="false"
+                          SkipGetTargetFrameworkProperties="true" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <!-- Copy the built worker (net472) into a 'worker' subfolder of the UI output so it can be launched at runtime. -->
+    <Target Name="CopyWorkerOutput" AfterTargets="Build">
+        <ItemGroup>
+            <WorkerFiles Include="$(MSBuildThisFileDirectory)../MsiBuilder.Worker/bin/$(Configuration)/net472/**/*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(WorkerFiles)"
+              DestinationFiles="@(WorkerFiles->'$(OutDir)worker/%(RecursiveDir)%(Filename)%(Extension)')"
+              SkipUnchangedFiles="true" />
+    </Target>
+
+</Project>
