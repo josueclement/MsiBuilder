@@ -4,21 +4,37 @@
         x:Class="MsiBuilderUI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         x:Name="Root"
-        Width="820" Height="900"
+        Width="980" Height="900"
         MinWidth="640" MinHeight="500"
         Title="MSI Builder">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="CardBorder" Color="#33808080" />
+    </Window.Resources>
 
     <Window.Styles>
         <Style Selector="TextBlock.section">
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="FontSize" Value="15" />
-            <Setter Property="Margin" Value="0,14,0,6" />
+            <Setter Property="Margin" Value="0,0,0,8" />
         </Style>
         <Style Selector="TextBlock.label">
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
         <Style Selector="Grid.row">
             <Setter Property="Margin" Value="0,3" />
+        </Style>
+        <!-- Fixed-width short-field cell: cells reflow in a WrapPanel (2-up wide, 1-up narrow) -->
+        <Style Selector="Grid.field">
+            <Setter Property="Width" Value="430" />
+            <Setter Property="Margin" Value="0,3,16,3" />
+        </Style>
+        <Style Selector="Border.card">
+            <Setter Property="BorderBrush" Value="{StaticResource CardBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="12" />
+            <Setter Property="Margin" Value="0,0,0,12" />
         </Style>
     </Window.Styles>
 
@@ -32,7 +48,7 @@
         </Menu>
 
         <!-- Build log (bottom) -->
-        <Border DockPanel.Dock="Bottom" Height="190" BorderBrush="#33808080" BorderThickness="1" Margin="10,0,10,10">
+        <Border DockPanel.Dock="Bottom" Height="190" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" Margin="10,0,10,10">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top" Text="Build log" FontWeight="Bold" Margin="6,4" />
                 <TextBox Text="{Binding BuildLog}"
@@ -48,7 +64,7 @@
         </Border>
 
         <!-- Build bar (bottom, above log) -->
-        <Border DockPanel.Dock="Bottom" Padding="10" BorderBrush="#33808080" BorderThickness="0,1,0,0">
+        <Border DockPanel.Dock="Bottom" Padding="10" BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0">
             <Grid ColumnDefinitions="Auto,Auto,*">
                 <Button Grid.Column="0"
                         Content="Build MSI"
@@ -74,165 +90,206 @@
         <ScrollViewer>
             <StackPanel Margin="14,8,14,8">
 
-                <TextBlock Classes="section" Text="General" />
-                <Grid Classes="row" ColumnDefinitions="160,*">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Application name" />
-                    <TextBox Grid.Column="1" Text="{Binding AppName}" />
-                </Grid>
-                <Grid Classes="row" ColumnDefinitions="160,*">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Version" />
-                    <TextBox Grid.Column="1" Text="{Binding Version}" PlaceholderText="e.g. 1.1.0" />
-                </Grid>
-                <Grid Classes="row" ColumnDefinitions="160,*">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Install scope" />
-                    <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
-                              ItemsSource="{Binding ScopeOptions}"
-                              SelectedItem="{Binding Scope}" />
-                </Grid>
+                <!-- General -->
+                <Border Classes="card">
+                    <StackPanel>
+                        <TextBlock Classes="section" Text="General" />
+                        <WrapPanel>
+                            <Grid Classes="field" ColumnDefinitions="150,*">
+                                <TextBlock Grid.Column="0" Classes="label" Text="App name" />
+                                <TextBox Grid.Column="1" Text="{Binding AppName}" />
+                            </Grid>
+                            <Grid Classes="field" ColumnDefinitions="150,*">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Version" />
+                                <TextBox Grid.Column="1" Text="{Binding Version}" PlaceholderText="e.g. 1.1.0" />
+                            </Grid>
+                            <Grid Classes="field" ColumnDefinitions="150,*">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Install scope" />
+                                <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding ScopeOptions}"
+                                          SelectedItem="{Binding Scope}" />
+                            </Grid>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
 
-                <TextBlock Classes="section" Text="Install directory" />
-                <Grid Classes="row" ColumnDefinitions="160,*">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Install path" />
-                    <TextBox Grid.Column="1" Text="{Binding InstallPath}" PlaceholderText="e.g. %ProgramFiles%\MyApp" />
-                </Grid>
-                <Grid Classes="row" ColumnDefinitions="160,*,Auto">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Release folder" />
-                    <TextBox Grid.Column="1" Text="{Binding ReleasePath}" PlaceholderText="folder with files to package" />
-                    <Button Grid.Column="2" Content="Browse…" Margin="6,0,0,0" Command="{Binding BrowseReleasePathCommand}" />
-                </Grid>
+                <!-- Install directory -->
+                <Border Classes="card">
+                    <StackPanel>
+                        <TextBlock Classes="section" Text="Install directory" />
+                        <Grid Classes="row" ColumnDefinitions="150,*">
+                            <TextBlock Grid.Column="0" Classes="label" Text="Install path" />
+                            <TextBox Grid.Column="1" Text="{Binding InstallPath}" PlaceholderText="e.g. %ProgramFiles%\MyApp" />
+                        </Grid>
+                        <Grid Classes="row" ColumnDefinitions="150,*,Auto">
+                            <TextBlock Grid.Column="0" Classes="label" Text="Release folder" />
+                            <TextBox Grid.Column="1" Text="{Binding ReleasePath}" PlaceholderText="folder with files to package" />
+                            <Button Grid.Column="2" Content="Browse…" Margin="6,0,0,0" Command="{Binding BrowseReleasePathCommand}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
 
-                <TextBlock Classes="section" Text="Identity" />
-                <Grid Classes="row" ColumnDefinitions="160,*,Auto">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Product Id (GUID)" />
-                    <TextBox Grid.Column="1" Text="{Binding ProductId}" PlaceholderText="GUID identifying this product version" />
-                    <Button Grid.Column="2" Content="Generate" Margin="6,0,0,0" Command="{Binding GenerateProductIdCommand}" />
-                </Grid>
-                <Grid Classes="row" ColumnDefinitions="160,*,Auto">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Upgrade code (GUID)" />
-                    <TextBox Grid.Column="1" Text="{Binding UpgradeCode}" PlaceholderText="GUID constant across versions" />
-                    <Button Grid.Column="2" Content="Generate" Margin="6,0,0,0" Command="{Binding GenerateUpgradeCodeCommand}" />
-                </Grid>
+                <!-- Identity -->
+                <Border Classes="card">
+                    <StackPanel>
+                        <TextBlock Classes="section" Text="Identity" />
+                        <Grid Classes="row" ColumnDefinitions="150,*,Auto">
+                            <TextBlock Grid.Column="0" Classes="label" Text="Product Id (GUID)" />
+                            <TextBox Grid.Column="1" Text="{Binding ProductId}" PlaceholderText="GUID identifying this product version" />
+                            <Button Grid.Column="2" Content="Generate" Margin="6,0,0,0" Command="{Binding GenerateProductIdCommand}" />
+                        </Grid>
+                        <Grid Classes="row" ColumnDefinitions="150,*,Auto">
+                            <TextBlock Grid.Column="0" Classes="label" Text="Upgrade code (GUID)" />
+                            <TextBox Grid.Column="1" Text="{Binding UpgradeCode}" PlaceholderText="GUID constant across versions" />
+                            <Button Grid.Column="2" Content="Generate" Margin="6,0,0,0" Command="{Binding GenerateUpgradeCodeCommand}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
 
-                <TextBlock Classes="section" Text="Control Panel info" />
-                <Grid Classes="row" ColumnDefinitions="160,*">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Manufacturer" />
-                    <TextBox Grid.Column="1" Text="{Binding Manufacturer}" />
-                </Grid>
-                <Grid Classes="row" ColumnDefinitions="160,*,Auto">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Product icon" />
-                    <TextBox Grid.Column="1" Text="{Binding ProductIcon}" PlaceholderText="optional .ico" />
-                    <Button Grid.Column="2" Content="Browse…" Margin="6,0,0,0" Command="{Binding BrowseProductIconCommand}" />
-                </Grid>
-                <Grid Classes="row" ColumnDefinitions="160,*">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Comments" />
-                    <TextBox Grid.Column="1" Text="{Binding Comments}" PlaceholderText="optional" />
-                </Grid>
-                <Grid Classes="row" ColumnDefinitions="160,*">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Contact" />
-                    <TextBox Grid.Column="1" Text="{Binding Contact}" PlaceholderText="optional" />
-                </Grid>
-                <Grid Classes="row" ColumnDefinitions="160,*">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Help link" />
-                    <TextBox Grid.Column="1" Text="{Binding HelpLink}" PlaceholderText="optional URL" />
-                </Grid>
-                <Grid Classes="row" ColumnDefinitions="160,*">
-                    <TextBlock Grid.Column="0" Classes="label" Text="About URL" />
-                    <TextBox Grid.Column="1" Text="{Binding UrlInfoAbout}" PlaceholderText="optional URL" />
-                </Grid>
+                <!-- Control Panel info -->
+                <Border Classes="card">
+                    <StackPanel>
+                        <TextBlock Classes="section" Text="Control Panel info" />
+                        <WrapPanel>
+                            <Grid Classes="field" ColumnDefinitions="150,*">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Manufacturer" />
+                                <TextBox Grid.Column="1" Text="{Binding Manufacturer}" />
+                            </Grid>
+                            <Grid Classes="field" ColumnDefinitions="150,*">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Contact" />
+                                <TextBox Grid.Column="1" Text="{Binding Contact}" PlaceholderText="optional" />
+                            </Grid>
+                            <Grid Classes="field" ColumnDefinitions="150,*">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Comments" />
+                                <TextBox Grid.Column="1" Text="{Binding Comments}" PlaceholderText="optional" />
+                            </Grid>
+                        </WrapPanel>
+                        <Grid Classes="row" ColumnDefinitions="150,*,Auto">
+                            <TextBlock Grid.Column="0" Classes="label" Text="Product icon" />
+                            <TextBox Grid.Column="1" Text="{Binding ProductIcon}" PlaceholderText="optional .ico" />
+                            <Button Grid.Column="2" Content="Browse…" Margin="6,0,0,0" Command="{Binding BrowseProductIconCommand}" />
+                        </Grid>
+                        <Grid Classes="row" ColumnDefinitions="150,*">
+                            <TextBlock Grid.Column="0" Classes="label" Text="Help link" />
+                            <TextBox Grid.Column="1" Text="{Binding HelpLink}" PlaceholderText="optional URL" />
+                        </Grid>
+                        <Grid Classes="row" ColumnDefinitions="150,*">
+                            <TextBlock Grid.Column="0" Classes="label" Text="About URL" />
+                            <TextBox Grid.Column="1" Text="{Binding UrlInfoAbout}" PlaceholderText="optional URL" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
 
-                <Grid ColumnDefinitions="*,Auto">
-                    <TextBlock Grid.Column="0" Classes="section" Text="Shortcuts" />
-                    <Button Grid.Column="1" Content="+ Add shortcut" VerticalAlignment="Bottom" Command="{Binding AddShortcutCommand}" />
-                </Grid>
-                <ItemsControl ItemsSource="{Binding Shortcuts}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:ShortcutViewModel">
-                            <Border BorderBrush="#33808080" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,4">
-                                <StackPanel>
-                                    <Grid ColumnDefinitions="160,*,Auto" Margin="0,2">
-                                        <TextBlock Grid.Column="0" Classes="label" Text="Location" />
-                                        <TextBox Grid.Column="1" Text="{Binding ShortcutPath}" PlaceholderText="e.g. %Desktop% or %ProgramMenu%" />
-                                        <Button Grid.Column="2" Content="Remove" Margin="6,0,0,0"
-                                                Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).RemoveShortcutCommand}"
-                                                CommandParameter="{Binding}" />
-                                    </Grid>
-                                    <Grid ColumnDefinitions="160,*" Margin="0,2">
-                                        <TextBlock Grid.Column="0" Classes="label" Text="Name" />
-                                        <TextBox Grid.Column="1" Text="{Binding ShortcutName}" />
-                                    </Grid>
-                                    <Grid ColumnDefinitions="160,*" Margin="0,2">
-                                        <TextBlock Grid.Column="0" Classes="label" Text="Target" />
-                                        <TextBox Grid.Column="1" Text="{Binding TargetPath}" PlaceholderText="e.g. [INSTALLDIR]\MyApp.exe" />
-                                    </Grid>
-                                    <Grid ColumnDefinitions="160,*,Auto" Margin="0,2">
-                                        <TextBlock Grid.Column="0" Classes="label" Text="Icon" />
-                                        <TextBox Grid.Column="1" Text="{Binding IconPath}" PlaceholderText=".ico" />
-                                        <Button Grid.Column="2" Content="Browse…" Margin="6,0,0,0" Command="{Binding BrowseIconCommand}" />
-                                    </Grid>
-                                    <Grid ColumnDefinitions="160,*" Margin="0,2">
-                                        <TextBlock Grid.Column="0" Classes="label" Text="Arguments" />
-                                        <TextBox Grid.Column="1" Text="{Binding Arguments}" PlaceholderText="optional" />
-                                    </Grid>
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <!-- Shortcuts -->
+                <Border Classes="card">
+                    <StackPanel>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Classes="section" Text="Shortcuts" />
+                            <Button Grid.Column="1" Content="+ Add shortcut" VerticalAlignment="Center" Command="{Binding AddShortcutCommand}" />
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding Shortcuts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ShortcutViewModel">
+                                    <Border BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,4">
+                                        <StackPanel>
+                                            <Grid ColumnDefinitions="160,*,Auto" Margin="0,2">
+                                                <TextBlock Grid.Column="0" Classes="label" Text="Location" />
+                                                <TextBox Grid.Column="1" Text="{Binding ShortcutPath}" PlaceholderText="e.g. %Desktop% or %ProgramMenu%" />
+                                                <Button Grid.Column="2" Content="Remove" Margin="6,0,0,0"
+                                                        Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).RemoveShortcutCommand}"
+                                                        CommandParameter="{Binding}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="160,*" Margin="0,2">
+                                                <TextBlock Grid.Column="0" Classes="label" Text="Name" />
+                                                <TextBox Grid.Column="1" Text="{Binding ShortcutName}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="160,*" Margin="0,2">
+                                                <TextBlock Grid.Column="0" Classes="label" Text="Target" />
+                                                <TextBox Grid.Column="1" Text="{Binding TargetPath}" PlaceholderText="e.g. [INSTALLDIR]\MyApp.exe" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="160,*,Auto" Margin="0,2">
+                                                <TextBlock Grid.Column="0" Classes="label" Text="Icon" />
+                                                <TextBox Grid.Column="1" Text="{Binding IconPath}" PlaceholderText=".ico" />
+                                                <Button Grid.Column="2" Content="Browse…" Margin="6,0,0,0" Command="{Binding BrowseIconCommand}" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="160,*" Margin="0,2">
+                                                <TextBlock Grid.Column="0" Classes="label" Text="Arguments" />
+                                                <TextBox Grid.Column="1" Text="{Binding Arguments}" PlaceholderText="optional" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
 
-                <TextBlock Classes="section" Text="Managed UI" />
-                <CheckBox Content="Customize installer UI (otherwise the builder's default UI is used)"
-                          IsChecked="{Binding UseCustomManagedUi}" />
-                <StackPanel IsVisible="{Binding UseCustomManagedUi}" Margin="0,6,0,0">
-                    <Grid Classes="row" ColumnDefinitions="160,*">
-                        <TextBlock Grid.Column="0" Classes="label" Text="UI dialog set (WUI)" />
-                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
-                                  ItemsSource="{Binding WuiOptions}"
-                                  SelectedItem="{Binding SelectedWui}" />
-                    </Grid>
-                    <TextBlock Text="Install dialogs" FontWeight="SemiBold" Margin="0,8,0,2" />
-                    <ItemsControl ItemsSource="{Binding InstallDialogOptions}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:DialogSelectionViewModel">
-                                <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsSelected}" Margin="0,0,12,0" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <TextBlock Text="Modify dialogs" FontWeight="SemiBold" Margin="0,8,0,2" />
-                    <ItemsControl ItemsSource="{Binding ModifyDialogOptions}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:DialogSelectionViewModel">
-                                <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsSelected}" Margin="0,0,12,0" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
+                <!-- Managed UI -->
+                <Border Classes="card">
+                    <StackPanel>
+                        <TextBlock Classes="section" Text="Managed UI" />
+                        <CheckBox Content="Customize installer UI (otherwise the builder's default UI is used)"
+                                  IsChecked="{Binding UseCustomManagedUi}" />
+                        <StackPanel IsVisible="{Binding UseCustomManagedUi}" Margin="0,6,0,0">
+                            <Grid Classes="row" ColumnDefinitions="160,*">
+                                <TextBlock Grid.Column="0" Classes="label" Text="UI dialog set (WUI)" />
+                                <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding WuiOptions}"
+                                          SelectedItem="{Binding SelectedWui}" />
+                            </Grid>
+                            <TextBlock Text="Install dialogs" FontWeight="SemiBold" Margin="0,8,0,2" />
+                            <ItemsControl ItemsSource="{Binding InstallDialogOptions}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:DialogSelectionViewModel">
+                                        <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsSelected}" Margin="0,0,12,0" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="Modify dialogs" FontWeight="SemiBold" Margin="0,8,0,2" />
+                            <ItemsControl ItemsSource="{Binding ModifyDialogOptions}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:DialogSelectionViewModel">
+                                        <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsSelected}" Margin="0,0,12,0" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
 
-                <TextBlock Classes="section" Text="Output" />
-                <Grid Classes="row" ColumnDefinitions="160,*">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Compression" />
-                    <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
-                              ItemsSource="{Binding CompressionOptions}"
-                              SelectedItem="{Binding Compression}" />
-                </Grid>
-                <Grid Classes="row" ColumnDefinitions="160,*,Auto">
-                    <TextBlock Grid.Column="0" Classes="label" Text="Output folder" />
-                    <TextBox Grid.Column="1" Text="{Binding OutputPath}" />
-                    <Button Grid.Column="2" Content="Browse…" Margin="6,0,0,0" Command="{Binding BrowseOutputPathCommand}" />
-                </Grid>
-                <Grid Classes="row" ColumnDefinitions="160,*">
-                    <TextBlock Grid.Column="0" Classes="label" Text="MSI file name" />
-                    <TextBox Grid.Column="1" Text="{Binding MsiFilename}" PlaceholderText="without path or extension" />
-                </Grid>
+                <!-- Output -->
+                <Border Classes="card">
+                    <StackPanel>
+                        <TextBlock Classes="section" Text="Output" />
+                        <WrapPanel>
+                            <Grid Classes="field" ColumnDefinitions="150,*">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Compression" />
+                                <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding CompressionOptions}"
+                                          SelectedItem="{Binding Compression}" />
+                            </Grid>
+                            <Grid Classes="field" ColumnDefinitions="150,*">
+                                <TextBlock Grid.Column="0" Classes="label" Text="MSI file name" />
+                                <TextBox Grid.Column="1" Text="{Binding MsiFilename}" PlaceholderText="without path or extension" />
+                            </Grid>
+                        </WrapPanel>
+                        <Grid Classes="row" ColumnDefinitions="150,*,Auto">
+                            <TextBlock Grid.Column="0" Classes="label" Text="Output folder" />
+                            <TextBox Grid.Column="1" Text="{Binding OutputPath}" />
+                            <Button Grid.Column="2" Content="Browse…" Margin="6,0,0,0" Command="{Binding BrowseOutputPathCommand}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
 
             </StackPanel>
         </ScrollViewer>
