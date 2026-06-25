@@ -1,4 +1,9 @@
 <Solution>
   <Project Path="src/MsiBuilder/MsiBuilder.csproj" />
   <Project Path="src/ConsoleApp1/ConsoleApp1.csproj" />
+  <Project Path="src/MsiBuilder.Contracts/MsiBuilder.Contracts.csproj" />
+  <Project Path="src/MsiBuilder.Worker/MsiBuilder.Worker.csproj" />
+  <Project Path="src/MsiBuilderUI/MsiBuilderUI.csproj" />
+  <Project Path="tests/MsiBuilderUI.Tests/MsiBuilderUI.Tests.csproj" />
+  <Project Path="tests/MsiBuilder.Worker.Tests/MsiBuilder.Worker.Tests.csproj" />
 </Solution>

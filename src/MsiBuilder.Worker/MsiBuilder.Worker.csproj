@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <!-- net472: WixSharp ManagedProject/ManagedUI is only stable on .NET Framework. -->
+        <TargetFramework>net472</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- WixSharp flows in transitively through the MsiBuilder reference. -->
+        <ProjectReference Include="..\MsiBuilder\MsiBuilder.csproj" />
+        <ProjectReference Include="..\MsiBuilder.Contracts\MsiBuilder.Contracts.csproj" />
+    </ItemGroup>
+
+</Project>
