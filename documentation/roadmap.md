@@ -11,3 +11,4 @@ Status vocabulary: `TODO`, `IN PROGRESS`, `DONE`, `ABANDONED`.
 | - PHASE01   | Contracts library (DTOs, enums, serializer)        | DONE        | (in FEATURE-002.md)               |
 | - PHASE02   | net472 worker exe                                  | DONE        | (in FEATURE-002.md)               |
 | - PHASE03   | Avalonia UI (host, MVVM, views, profiles, tests)   | DONE        | (in FEATURE-002.md)               |
+| FEATURE-003 | Main form layout redesign (cards + responsive paired fields) | DONE        | documentation/plan/FEATURE-003.md |
