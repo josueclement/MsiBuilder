@@ -35,6 +35,9 @@ public partial class App : Application
             _services.GetRequiredService<IFileDialogService>().SetStorageProvider(mainWindow.StorageProvider);
             _services.GetRequiredService<IFolderDialogService>().SetStorageProvider(mainWindow.StorageProvider);
 
+            // Carbon's InfoBar service renders into the host control declared in MainWindow's root panel.
+            _services.GetRequiredService<IInfoBarService>().RegisterHost(mainWindow.HostInfoBar);
+
             desktop.MainWindow = mainWindow;
         }
 

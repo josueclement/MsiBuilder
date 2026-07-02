@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Carbon.Avalonia.Desktop.Controls.InfoBar;
+using Carbon.Avalonia.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MsiBuilder.Contracts;
@@ -17,12 +19,14 @@ public class MainWindowViewModel : ObservableObject
     private readonly IMsiBuildService _buildService;
     private readonly IStoragePickerService _picker;
     private readonly IProfileService _profileService;
+    private readonly IInfoBarService _infoBar;
 
-    public MainWindowViewModel(IMsiBuildService buildService, IStoragePickerService picker, IProfileService profileService)
+    public MainWindowViewModel(IMsiBuildService buildService, IStoragePickerService picker, IProfileService profileService, IInfoBarService infoBar)
     {
         _buildService = buildService;
         _picker = picker;
         _profileService = profileService;
+        _infoBar = infoBar;
 
         InstallDialogOptions = CreateDialogOptions();
         ModifyDialogOptions = CreateDialogOptions();
@@ -147,11 +151,11 @@ public class MainWindowViewModel : ObservableObject
         try
         {
             await _profileService.SaveAsync(ToRequest(), path);
-            SetStatus(true, $"Profile saved to {path}");
+            ShowResult(true, $"Profile saved to {path}");
         }
         catch (Exception ex)
         {
-            SetStatus(false, $"Failed to save profile: {ex.Message}");
+            ShowResult(false, $"Failed to save profile: {ex.Message}");
         }
     }
 
@@ -165,11 +169,11 @@ public class MainWindowViewModel : ObservableObject
         {
             MsiBuildRequest request = await _profileService.LoadAsync(path);
             LoadFrom(request);
-            SetStatus(true, $"Profile loaded from {path}");
+            ShowResult(true, $"Profile loaded from {path}");
         }
         catch (Exception ex)
         {
-            SetStatus(false, $"Failed to load profile: {ex.Message}");
+            ShowResult(false, $"Failed to load profile: {ex.Message}");
         }
     }
 
@@ -180,7 +184,7 @@ public class MainWindowViewModel : ObservableObject
         string? validationError = Validate(request);
         if (validationError is not null)
         {
-            SetStatus(false, validationError);
+            ShowResult(false, validationError);
             return;
         }
 
@@ -194,14 +198,14 @@ public class MainWindowViewModel : ObservableObject
         {
             MsiBuildResult result = await _buildService.BuildAsync(request, progress, CancellationToken.None);
             if (result.Success)
-                SetStatus(true, $"MSI created: {result.MsiPath}");
+                ShowResult(true, $"MSI created: {result.MsiPath}");
             else
-                SetStatus(false, result.Message ?? "Build failed.");
+                ShowResult(false, result.Message ?? "Build failed.");
         }
         catch (Exception ex)
         {
             AppendLog(ex.ToString());
-            SetStatus(false, $"Build error: {ex.Message}");
+            ShowResult(false, $"Build error: {ex.Message}");
         }
         finally
         {
@@ -212,11 +216,34 @@ public class MainWindowViewModel : ObservableObject
     private void AppendLog(string line)
         => BuildLog = BuildLog.Length == 0 ? line : BuildLog + Environment.NewLine + line;
 
-    private void SetStatus(bool success, string message)
+    private void ShowResult(bool success, string message)
     {
         LastBuildSucceeded = success;
         StatusMessage = (success ? "✔ " : "✖ ") + message;
         HasResult = true;
+
+        // Fire-and-forget: the Carbon InfoBar's ShowAsync completes only when the user dismisses the bar.
+        // Awaiting it here would keep the build "in progress" (IsBuilding true, command disabled) until the
+        // notification is closed, so we start it without blocking the calling flow.
+        _ = ShowInfoBarAsync(success, message);
+    }
+
+    private async Task ShowInfoBarAsync(bool success, string message)
+    {
+        try
+        {
+            await _infoBar.ShowAsync(bar =>
+            {
+                bar.Title = success ? "Success" : "Error";
+                bar.Message = message;
+                bar.Severity = success ? InfoBarSeverity.Success : InfoBarSeverity.Error;
+            });
+        }
+        catch (InvalidOperationException)
+        {
+            // ShowAsync throws only when no InfoBar host has been registered (a startup wiring error);
+            // a normally displayed bar's task simply completes when it is dismissed.
+        }
     }
 
     private static string? Validate(MsiBuildRequest request)

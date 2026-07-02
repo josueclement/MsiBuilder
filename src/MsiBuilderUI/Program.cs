@@ -22,6 +22,7 @@ internal static class Program
         builder.Services.AddSingleton<IMsiBuildService, WorkerMsiBuildService>();
         builder.Services.AddSingleton<IFileDialogService, FileDialogService>();
         builder.Services.AddSingleton<IFolderDialogService, FolderDialogService>();
+        builder.Services.AddSingleton<IInfoBarService, InfoBarService>();
         builder.Services.AddSingleton<IStoragePickerService, CarbonStoragePickerService>();
         builder.Services.AddSingleton<IProfileService, ProfileService>();
         builder.Services.AddSingleton<MainWindowViewModel>();

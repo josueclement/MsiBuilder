@@ -1,11 +1,11 @@
 # FEATURE-004 — Improve the Avalonia UI with Carbon.Avalonia.Desktop
 
-**Status:** IN PROGRESS
+**Status:** DONE
 
-| Phase   | Title                                                      | Status      |
-|---------|------------------------------------------------------------|-------------|
-| PHASE01 | Carbon foundation (package, theme, services, picker swap)  | DONE        |
-| PHASE02 | Carbon UI redesign (SettingsCards, icons, InfoBar, toggle) | TODO        |
+| Phase   | Title                                                      | Status |
+|---------|------------------------------------------------------------|--------|
+| PHASE01 | Carbon foundation (package, theme, services, picker swap)  | DONE   |
+| PHASE02 | Carbon UI redesign (SettingsCards, icons, InfoBar, toggle) | DONE   |
 
 ## Objective
 
@@ -81,9 +81,11 @@ pickers routed through Carbon.
   the redundant bottom `StatusMessage` `TextBlock` (InfoBar replaces it); keep the progress bar + log.
 - `src/MsiBuilderUI/Views/MainWindow.axaml.cs` — theme-toggle handler setting
   `Application.Current.RequestedThemeVariant` (Dark/Light).
-- `src/MsiBuilderUI/ViewModels/MainWindowViewModel.cs` — inject `IInfoBarService`; add
-  `ShowResultAsync(bool, string)` that sets `StatusMessage`/`HasResult`/`LastBuildSucceeded` and
-  awaits `_infoBar.ShowAsync(…)` (Success/Error); replace the `SetStatus(...)` calls.
+- `src/MsiBuilderUI/ViewModels/MainWindowViewModel.cs` — inject `IInfoBarService`; replace the
+  synchronous `SetStatus(...)` with `ShowResult(...)` that sets `StatusMessage`/`HasResult`/
+  `LastBuildSucceeded` and **fire-and-forgets** the InfoBar (Success/Error) via a `ShowInfoBarAsync`
+  helper. Carbon's `InfoBar.ShowAsync` completes only on dismissal, so awaiting it would keep the
+  build "in progress" until the user closed the bar (caught by the PHASE02 review — see Notes).
 - `tests/MsiBuilderUI.Tests/MainWindowViewModelTests.cs` — substitute `IInfoBarService` in the
   `CreateVm` factory; add InfoBar-severity assertions for build success and failure/invalid-GUID.
 
@@ -106,3 +108,10 @@ pickers routed through Carbon.
 ## Notes
 - Pre-existing CRLF↔LF working-tree noise (45 files, zero content change) was parked in a git stash
   to get a clean tree before branching (no `.gitattributes` in the repo — a suggested follow-up).
+- PHASE01 review: kept `RequestedThemeVariant="Default"` in PHASE01 (behavior-neutral) and moved the
+  Dark default into PHASE02 with the toggle.
+- PHASE02 review (decompiled Carbon 0.2.0): `InfoBar.ShowAsync` completes only on user dismissal, so
+  the initial `await` would have kept `IsBuilding`/commands blocked until the bar was closed. Fixed by
+  making the notification fire-and-forget; guarded by the `Build_DoesNotWaitForInfoBarDismissal` test.
+- Environment: the net472 `MsiBuilder.Worker.Tests` need `mono` to run on Linux (absent here) and the
+  Avalonia GUI needs `libfontconfig` for Skia (absent here), so visual verification is done on Windows.
