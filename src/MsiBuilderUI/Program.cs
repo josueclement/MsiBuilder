@@ -1,5 +1,6 @@
 using System;
 using Avalonia;
+using Carbon.Avalonia.Desktop.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,7 +20,9 @@ internal static class Program
 
         builder.Services.Configure<WorkerOptions>(builder.Configuration.GetSection(WorkerOptions.SectionName));
         builder.Services.AddSingleton<IMsiBuildService, WorkerMsiBuildService>();
-        builder.Services.AddSingleton<IStoragePickerService, AvaloniaStoragePickerService>();
+        builder.Services.AddSingleton<IFileDialogService, FileDialogService>();
+        builder.Services.AddSingleton<IFolderDialogService, FolderDialogService>();
+        builder.Services.AddSingleton<IStoragePickerService, CarbonStoragePickerService>();
         builder.Services.AddSingleton<IProfileService, ProfileService>();
         builder.Services.AddSingleton<MainWindowViewModel>();
         builder.Services.AddTransient<MainWindow>();
