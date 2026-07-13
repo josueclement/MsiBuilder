@@ -10,6 +10,7 @@
         Width="980" Height="900"
         MinWidth="640" MinHeight="500"
         Title="MSI Builder"
+        Icon="/Assets/MsiBuilderUI.ico"
         Background="{DynamicResource CarbonBackgroundBrush}">
 
     <Window.Styles>

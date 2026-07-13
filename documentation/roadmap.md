@@ -15,4 +15,4 @@ Status vocabulary: `TODO`, `IN PROGRESS`, `DONE`, `ABANDONED`.
 | FEATURE-004 | Improve the Avalonia UI with Carbon.Avalonia.Desktop | DONE        | documentation/plan/FEATURE-004.md |
 | - PHASE01   | Carbon foundation (package, theme, services, picker swap)    | DONE        | (in FEATURE-004.md)               |
 | - PHASE02   | Carbon UI redesign (SettingsCards, icons, InfoBar, toggle)   | DONE        | (in FEATURE-004.md)               |
-| FEATURE-005 | Release MsiBuilderUI v1.0.0 (icon, metadata, MSI profile)    | TODO        | documentation/plan/FEATURE-005.md |
+| FEATURE-005 | Release MsiBuilderUI v1.0.0 (icon, metadata, MSI profile)    | DONE        | documentation/plan/FEATURE-005.md |

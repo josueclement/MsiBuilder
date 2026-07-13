@@ -9,6 +9,10 @@
         <WarningsAsErrors>nullable</WarningsAsErrors>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <Version>1.0.0</Version>
+        <Authors>Josué Clément</Authors>
+        <Copyright>Copyright © 2025 Josué Clément</Copyright>
+        <ApplicationIcon>Assets/MsiBuilderUI.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -32,6 +36,11 @@
 
     <ItemGroup>
         <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <!-- App icon exposed as an Avalonia resource so it can be loaded as the Window/taskbar icon at runtime. -->
+    <ItemGroup>
+        <AvaloniaResource Include="Assets/**" />
     </ItemGroup>
 
     <!-- Copy the built worker (net472) into a 'worker' subfolder of the UI output so it can be launched at runtime. -->
