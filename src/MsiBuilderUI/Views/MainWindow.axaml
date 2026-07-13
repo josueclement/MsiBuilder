@@ -1,23 +1,18 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:MsiBuilderUI.ViewModels"
+        xmlns:carbon="using:Carbon.Avalonia.Desktop.Controls"
+        xmlns:infoBar="using:Carbon.Avalonia.Desktop.Controls.InfoBar"
+        xmlns:pia="using:PhosphorIconsAvalonia.Markup"
         x:Class="MsiBuilderUI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         x:Name="Root"
         Width="980" Height="900"
         MinWidth="640" MinHeight="500"
-        Title="MSI Builder">
-
-    <Window.Resources>
-        <SolidColorBrush x:Key="CardBorder" Color="#33808080" />
-    </Window.Resources>
+        Title="MSI Builder"
+        Background="{DynamicResource CarbonBackgroundBrush}">
 
     <Window.Styles>
-        <Style Selector="TextBlock.section">
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="FontSize" Value="15" />
-            <Setter Property="Margin" Value="0,0,0,8" />
-        </Style>
         <Style Selector="TextBlock.label">
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
@@ -29,71 +24,83 @@
             <Setter Property="Width" Value="430" />
             <Setter Property="Margin" Value="0,3,16,3" />
         </Style>
-        <Style Selector="Border.card">
-            <Setter Property="BorderBrush" Value="{StaticResource CardBorder}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Padding" Value="12" />
-            <Setter Property="Margin" Value="0,0,0,12" />
+        <!-- Default sizing for the Phosphor icons placed inside buttons -->
+        <Style Selector="Button PathIcon">
+            <Setter Property="Width" Value="14" />
+            <Setter Property="Height" Value="14" />
         </Style>
     </Window.Styles>
 
-    <DockPanel>
+    <Panel>
+        <DockPanel>
 
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="_Save profile…" Command="{Binding SaveProfileCommand}" />
-                <MenuItem Header="_Load profile…" Command="{Binding LoadProfileCommand}" />
-            </MenuItem>
-        </Menu>
-
-        <!-- Build log (bottom) -->
-        <Border DockPanel.Dock="Bottom" Height="190" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" Margin="10,0,10,10">
-            <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="Build log" FontWeight="Bold" Margin="6,4" />
-                <TextBox Text="{Binding BuildLog}"
-                         IsReadOnly="True"
-                         AcceptsReturn="True"
-                         TextWrapping="NoWrap"
-                         FontFamily="Cascadia Code,Consolas,Menlo,monospace"
-                         FontSize="12"
-                         VerticalAlignment="Stretch"
-                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                         ScrollViewer.VerticalScrollBarVisibility="Auto" />
-            </DockPanel>
-        </Border>
-
-        <!-- Build bar (bottom, above log) -->
-        <Border DockPanel.Dock="Bottom" Padding="10" BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0">
-            <Grid ColumnDefinitions="Auto,Auto,*">
-                <Button Grid.Column="0"
-                        Content="Build MSI"
-                        FontWeight="Bold"
-                        Padding="18,8"
-                        Command="{Binding BuildCommand}" />
-                <ProgressBar Grid.Column="1"
-                             Width="120"
-                             Margin="12,0"
-                             IsIndeterminate="True"
-                             VerticalAlignment="Center"
-                             IsVisible="{Binding IsBuilding}" />
-                <TextBlock Grid.Column="2"
-                           Text="{Binding StatusMessage}"
-                           IsVisible="{Binding HasResult}"
-                           TextWrapping="Wrap"
-                           VerticalAlignment="Center"
-                           Margin="8,0,0,0" />
+            <!-- Top bar: File menu + theme toggle -->
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto">
+                <Menu Grid.Column="0">
+                    <MenuItem Header="_File">
+                        <MenuItem Header="_Save profile…" Command="{Binding SaveProfileCommand}" />
+                        <MenuItem Header="_Load profile…" Command="{Binding LoadProfileCommand}" />
+                    </MenuItem>
+                </Menu>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
+                            VerticalAlignment="Center" Margin="0,0,12,0">
+                    <PathIcon Data="{pia:IconGeometry Icon=moon}" Width="16" Height="16"
+                              VerticalAlignment="Center"
+                              Foreground="{DynamicResource CarbonForegroundSecondaryBrush}" />
+                    <ToggleSwitch x:Name="ThemeToggle"
+                                  IsChecked="True"
+                                  OnContent="Dark" OffContent="Light"
+                                  VerticalAlignment="Center"
+                                  IsCheckedChanged="OnThemeToggleChanged" />
+                </StackPanel>
             </Grid>
-        </Border>
 
-        <!-- Form (fills) -->
-        <ScrollViewer>
-            <StackPanel Margin="14,8,14,8">
+            <!-- Build log (bottom) -->
+            <Border DockPanel.Dock="Bottom" Height="190"
+                    BorderBrush="{DynamicResource CarbonBorderBrush}" BorderThickness="1"
+                    CornerRadius="6" Margin="14,0,14,14">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Build log" FontWeight="Bold" Margin="8,6" />
+                    <TextBox Text="{Binding BuildLog}"
+                             IsReadOnly="True"
+                             AcceptsReturn="True"
+                             TextWrapping="NoWrap"
+                             FontFamily="Cascadia Code,Consolas,Menlo,monospace"
+                             FontSize="12"
+                             VerticalAlignment="Stretch"
+                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                </DockPanel>
+            </Border>
 
-                <!-- General -->
-                <Border Classes="card">
-                    <StackPanel>
-                        <TextBlock Classes="section" Text="General" />
+            <!-- Build bar (bottom, above log) -->
+            <Border DockPanel.Dock="Bottom" Padding="14,10"
+                    BorderBrush="{DynamicResource CarbonBorderBrush}" BorderThickness="0,1,0,0">
+                <Grid ColumnDefinitions="Auto,Auto,*">
+                    <Button Grid.Column="0" Padding="18,8" Command="{Binding BuildCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Data="{pia:IconGeometry Icon=hammer}" Width="16" Height="16" />
+                            <TextBlock Text="Build MSI" FontWeight="Bold" />
+                        </StackPanel>
+                    </Button>
+                    <ProgressBar Grid.Column="1"
+                                 Width="120"
+                                 Margin="12,0"
+                                 IsIndeterminate="True"
+                                 VerticalAlignment="Center"
+                                 IsVisible="{Binding IsBuilding}" />
+                </Grid>
+            </Border>
+
+            <!-- Form (fills) -->
+            <ScrollViewer>
+                <StackPanel Margin="14,8,14,8" Spacing="8">
+
+                    <!-- General -->
+                    <carbon:SettingsCardExpander Header="General"
+                                                 Description="Application name, version, and install scope"
+                                                 IconData="{pia:IconGeometry Icon=gear}"
+                                                 IsExpanded="True">
                         <WrapPanel>
                             <Grid Classes="field" ColumnDefinitions="150,*">
                                 <TextBlock Grid.Column="0" Classes="label" Text="App name" />
@@ -110,189 +117,242 @@
                                           SelectedItem="{Binding Scope}" />
                             </Grid>
                         </WrapPanel>
-                    </StackPanel>
-                </Border>
+                    </carbon:SettingsCardExpander>
 
-                <!-- Install directory -->
-                <Border Classes="card">
-                    <StackPanel>
-                        <TextBlock Classes="section" Text="Install directory" />
-                        <Grid Classes="row" ColumnDefinitions="150,*">
-                            <TextBlock Grid.Column="0" Classes="label" Text="Install path" />
-                            <TextBox Grid.Column="1" Text="{Binding InstallPath}" PlaceholderText="e.g. %ProgramFiles%\MyApp" />
-                        </Grid>
-                        <Grid Classes="row" ColumnDefinitions="150,*,Auto">
-                            <TextBlock Grid.Column="0" Classes="label" Text="Release folder" />
-                            <TextBox Grid.Column="1" Text="{Binding ReleasePath}" PlaceholderText="folder with files to package" />
-                            <Button Grid.Column="2" Content="Browse…" Margin="6,0,0,0" Command="{Binding BrowseReleasePathCommand}" />
-                        </Grid>
-                    </StackPanel>
-                </Border>
-
-                <!-- Identity -->
-                <Border Classes="card">
-                    <StackPanel>
-                        <TextBlock Classes="section" Text="Identity" />
-                        <Grid Classes="row" ColumnDefinitions="150,*,Auto">
-                            <TextBlock Grid.Column="0" Classes="label" Text="Product Id (GUID)" />
-                            <TextBox Grid.Column="1" Text="{Binding ProductId}" PlaceholderText="GUID identifying this product version" />
-                            <Button Grid.Column="2" Content="Generate" Margin="6,0,0,0" Command="{Binding GenerateProductIdCommand}" />
-                        </Grid>
-                        <Grid Classes="row" ColumnDefinitions="150,*,Auto">
-                            <TextBlock Grid.Column="0" Classes="label" Text="Upgrade code (GUID)" />
-                            <TextBox Grid.Column="1" Text="{Binding UpgradeCode}" PlaceholderText="GUID constant across versions" />
-                            <Button Grid.Column="2" Content="Generate" Margin="6,0,0,0" Command="{Binding GenerateUpgradeCodeCommand}" />
-                        </Grid>
-                    </StackPanel>
-                </Border>
-
-                <!-- Control Panel info -->
-                <Border Classes="card">
-                    <StackPanel>
-                        <TextBlock Classes="section" Text="Control Panel info" />
-                        <WrapPanel>
-                            <Grid Classes="field" ColumnDefinitions="150,*">
-                                <TextBlock Grid.Column="0" Classes="label" Text="Manufacturer" />
-                                <TextBox Grid.Column="1" Text="{Binding Manufacturer}" />
+                    <!-- Install directory -->
+                    <carbon:SettingsCardExpander Header="Install directory"
+                                                 Description="Where the app installs and the folder to package"
+                                                 IconData="{pia:IconGeometry Icon=hard_drives}"
+                                                 IsExpanded="True">
+                        <StackPanel>
+                            <Grid Classes="row" ColumnDefinitions="150,*">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Install path" />
+                                <TextBox Grid.Column="1" Text="{Binding InstallPath}" PlaceholderText="e.g. %ProgramFiles%\MyApp" />
                             </Grid>
-                            <Grid Classes="field" ColumnDefinitions="150,*">
-                                <TextBlock Grid.Column="0" Classes="label" Text="Contact" />
-                                <TextBox Grid.Column="1" Text="{Binding Contact}" PlaceholderText="optional" />
+                            <Grid Classes="row" ColumnDefinitions="150,*,Auto">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Release folder" />
+                                <TextBox Grid.Column="1" Text="{Binding ReleasePath}" PlaceholderText="folder with files to package" />
+                                <Button Grid.Column="2" Margin="6,0,0,0" Command="{Binding BrowseReleasePathCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <PathIcon Data="{pia:IconGeometry Icon=folder_open}" />
+                                        <TextBlock Text="Browse…" />
+                                    </StackPanel>
+                                </Button>
                             </Grid>
-                            <Grid Classes="field" ColumnDefinitions="150,*">
-                                <TextBlock Grid.Column="0" Classes="label" Text="Comments" />
-                                <TextBox Grid.Column="1" Text="{Binding Comments}" PlaceholderText="optional" />
-                            </Grid>
-                        </WrapPanel>
-                        <Grid Classes="row" ColumnDefinitions="150,*,Auto">
-                            <TextBlock Grid.Column="0" Classes="label" Text="Product icon" />
-                            <TextBox Grid.Column="1" Text="{Binding ProductIcon}" PlaceholderText="optional .ico" />
-                            <Button Grid.Column="2" Content="Browse…" Margin="6,0,0,0" Command="{Binding BrowseProductIconCommand}" />
-                        </Grid>
-                        <Grid Classes="row" ColumnDefinitions="150,*">
-                            <TextBlock Grid.Column="0" Classes="label" Text="Help link" />
-                            <TextBox Grid.Column="1" Text="{Binding HelpLink}" PlaceholderText="optional URL" />
-                        </Grid>
-                        <Grid Classes="row" ColumnDefinitions="150,*">
-                            <TextBlock Grid.Column="0" Classes="label" Text="About URL" />
-                            <TextBox Grid.Column="1" Text="{Binding UrlInfoAbout}" PlaceholderText="optional URL" />
-                        </Grid>
-                    </StackPanel>
-                </Border>
+                        </StackPanel>
+                    </carbon:SettingsCardExpander>
 
-                <!-- Shortcuts -->
-                <Border Classes="card">
-                    <StackPanel>
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Classes="section" Text="Shortcuts" />
-                            <Button Grid.Column="1" Content="+ Add shortcut" VerticalAlignment="Center" Command="{Binding AddShortcutCommand}" />
-                        </Grid>
-                        <ItemsControl ItemsSource="{Binding Shortcuts}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:ShortcutViewModel">
-                                    <Border BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,4">
-                                        <StackPanel>
-                                            <Grid ColumnDefinitions="160,*,Auto" Margin="0,2">
-                                                <TextBlock Grid.Column="0" Classes="label" Text="Location" />
-                                                <TextBox Grid.Column="1" Text="{Binding ShortcutPath}" PlaceholderText="e.g. %Desktop% or %ProgramMenu%" />
-                                                <Button Grid.Column="2" Content="Remove" Margin="6,0,0,0"
-                                                        Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).RemoveShortcutCommand}"
-                                                        CommandParameter="{Binding}" />
-                                            </Grid>
-                                            <Grid ColumnDefinitions="160,*" Margin="0,2">
-                                                <TextBlock Grid.Column="0" Classes="label" Text="Name" />
-                                                <TextBox Grid.Column="1" Text="{Binding ShortcutName}" />
-                                            </Grid>
-                                            <Grid ColumnDefinitions="160,*" Margin="0,2">
-                                                <TextBlock Grid.Column="0" Classes="label" Text="Target" />
-                                                <TextBox Grid.Column="1" Text="{Binding TargetPath}" PlaceholderText="e.g. [INSTALLDIR]\MyApp.exe" />
-                                            </Grid>
-                                            <Grid ColumnDefinitions="160,*,Auto" Margin="0,2">
-                                                <TextBlock Grid.Column="0" Classes="label" Text="Icon" />
-                                                <TextBox Grid.Column="1" Text="{Binding IconPath}" PlaceholderText=".ico" />
-                                                <Button Grid.Column="2" Content="Browse…" Margin="6,0,0,0" Command="{Binding BrowseIconCommand}" />
-                                            </Grid>
-                                            <Grid ColumnDefinitions="160,*" Margin="0,2">
-                                                <TextBlock Grid.Column="0" Classes="label" Text="Arguments" />
-                                                <TextBox Grid.Column="1" Text="{Binding Arguments}" PlaceholderText="optional" />
-                                            </Grid>
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Border>
-
-                <!-- Managed UI -->
-                <Border Classes="card">
-                    <StackPanel>
-                        <TextBlock Classes="section" Text="Managed UI" />
-                        <CheckBox Content="Customize installer UI (otherwise the builder's default UI is used)"
-                                  IsChecked="{Binding UseCustomManagedUi}" />
-                        <StackPanel IsVisible="{Binding UseCustomManagedUi}" Margin="0,6,0,0">
-                            <Grid Classes="row" ColumnDefinitions="160,*">
-                                <TextBlock Grid.Column="0" Classes="label" Text="UI dialog set (WUI)" />
-                                <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
-                                          ItemsSource="{Binding WuiOptions}"
-                                          SelectedItem="{Binding SelectedWui}" />
+                    <!-- Identity -->
+                    <carbon:SettingsCardExpander Header="Identity"
+                                                 Description="Product and upgrade GUIDs"
+                                                 IconData="{pia:IconGeometry Icon=fingerprint}"
+                                                 IsExpanded="True">
+                        <StackPanel>
+                            <Grid Classes="row" ColumnDefinitions="150,*,Auto">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Product Id (GUID)" />
+                                <TextBox Grid.Column="1" Text="{Binding ProductId}" PlaceholderText="GUID identifying this product version" />
+                                <Button Grid.Column="2" Margin="6,0,0,0" Command="{Binding GenerateProductIdCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <PathIcon Data="{pia:IconGeometry Icon=arrows_clockwise}" />
+                                        <TextBlock Text="Generate" />
+                                    </StackPanel>
+                                </Button>
                             </Grid>
-                            <TextBlock Text="Install dialogs" FontWeight="SemiBold" Margin="0,8,0,2" />
-                            <ItemsControl ItemsSource="{Binding InstallDialogOptions}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
+                            <Grid Classes="row" ColumnDefinitions="150,*,Auto">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Upgrade code (GUID)" />
+                                <TextBox Grid.Column="1" Text="{Binding UpgradeCode}" PlaceholderText="GUID constant across versions" />
+                                <Button Grid.Column="2" Margin="6,0,0,0" Command="{Binding GenerateUpgradeCodeCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <PathIcon Data="{pia:IconGeometry Icon=arrows_clockwise}" />
+                                        <TextBlock Text="Generate" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </StackPanel>
+                    </carbon:SettingsCardExpander>
+
+                    <!-- Control Panel info -->
+                    <carbon:SettingsCardExpander Header="Control Panel info"
+                                                 Description="Publisher and Add/Remove Programs details"
+                                                 IconData="{pia:IconGeometry Icon=identification_card}"
+                                                 IsExpanded="True">
+                        <StackPanel>
+                            <WrapPanel>
+                                <Grid Classes="field" ColumnDefinitions="150,*">
+                                    <TextBlock Grid.Column="0" Classes="label" Text="Manufacturer" />
+                                    <TextBox Grid.Column="1" Text="{Binding Manufacturer}" />
+                                </Grid>
+                                <Grid Classes="field" ColumnDefinitions="150,*">
+                                    <TextBlock Grid.Column="0" Classes="label" Text="Contact" />
+                                    <TextBox Grid.Column="1" Text="{Binding Contact}" PlaceholderText="optional" />
+                                </Grid>
+                                <Grid Classes="field" ColumnDefinitions="150,*">
+                                    <TextBlock Grid.Column="0" Classes="label" Text="Comments" />
+                                    <TextBox Grid.Column="1" Text="{Binding Comments}" PlaceholderText="optional" />
+                                </Grid>
+                            </WrapPanel>
+                            <Grid Classes="row" ColumnDefinitions="150,*,Auto">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Product icon" />
+                                <TextBox Grid.Column="1" Text="{Binding ProductIcon}" PlaceholderText="optional .ico" />
+                                <Button Grid.Column="2" Margin="6,0,0,0" Command="{Binding BrowseProductIconCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <PathIcon Data="{pia:IconGeometry Icon=folder_open}" />
+                                        <TextBlock Text="Browse…" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="150,*">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Help link" />
+                                <TextBox Grid.Column="1" Text="{Binding HelpLink}" PlaceholderText="optional URL" />
+                            </Grid>
+                            <Grid Classes="row" ColumnDefinitions="150,*">
+                                <TextBlock Grid.Column="0" Classes="label" Text="About URL" />
+                                <TextBox Grid.Column="1" Text="{Binding UrlInfoAbout}" PlaceholderText="optional URL" />
+                            </Grid>
+                        </StackPanel>
+                    </carbon:SettingsCardExpander>
+
+                    <!-- Shortcuts -->
+                    <carbon:SettingsCardExpander Header="Shortcuts"
+                                                 Description="Desktop and Start menu shortcuts"
+                                                 IconData="{pia:IconGeometry Icon=link}"
+                                                 IsExpanded="False">
+                        <StackPanel>
+                            <Button HorizontalAlignment="Left" Margin="0,0,0,6" Command="{Binding AddShortcutCommand}">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <PathIcon Data="{pia:IconGeometry Icon=plus}" />
+                                    <TextBlock Text="Add shortcut" />
+                                </StackPanel>
+                            </Button>
+                            <ItemsControl ItemsSource="{Binding Shortcuts}">
                                 <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="vm:DialogSelectionViewModel">
-                                        <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsSelected}" Margin="0,0,12,0" />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                            <TextBlock Text="Modify dialogs" FontWeight="SemiBold" Margin="0,8,0,2" />
-                            <ItemsControl ItemsSource="{Binding ModifyDialogOptions}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="vm:DialogSelectionViewModel">
-                                        <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsSelected}" Margin="0,0,12,0" />
+                                    <DataTemplate x:DataType="vm:ShortcutViewModel">
+                                        <Border BorderBrush="{DynamicResource CarbonBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,4">
+                                            <StackPanel>
+                                                <Grid ColumnDefinitions="160,*,Auto" Margin="0,2">
+                                                    <TextBlock Grid.Column="0" Classes="label" Text="Location" />
+                                                    <TextBox Grid.Column="1" Text="{Binding ShortcutPath}" PlaceholderText="e.g. %Desktop% or %ProgramMenu%" />
+                                                    <Button Grid.Column="2" Margin="6,0,0,0"
+                                                            Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).RemoveShortcutCommand}"
+                                                            CommandParameter="{Binding}">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                                            <PathIcon Data="{pia:IconGeometry Icon=trash}" />
+                                                            <TextBlock Text="Remove" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                </Grid>
+                                                <Grid ColumnDefinitions="160,*" Margin="0,2">
+                                                    <TextBlock Grid.Column="0" Classes="label" Text="Name" />
+                                                    <TextBox Grid.Column="1" Text="{Binding ShortcutName}" />
+                                                </Grid>
+                                                <Grid ColumnDefinitions="160,*" Margin="0,2">
+                                                    <TextBlock Grid.Column="0" Classes="label" Text="Target" />
+                                                    <TextBox Grid.Column="1" Text="{Binding TargetPath}" PlaceholderText="e.g. [INSTALLDIR]\MyApp.exe" />
+                                                </Grid>
+                                                <Grid ColumnDefinitions="160,*,Auto" Margin="0,2">
+                                                    <TextBlock Grid.Column="0" Classes="label" Text="Icon" />
+                                                    <TextBox Grid.Column="1" Text="{Binding IconPath}" PlaceholderText=".ico" />
+                                                    <Button Grid.Column="2" Margin="6,0,0,0" Command="{Binding BrowseIconCommand}">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                                            <PathIcon Data="{pia:IconGeometry Icon=folder_open}" />
+                                                            <TextBlock Text="Browse…" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                </Grid>
+                                                <Grid ColumnDefinitions="160,*" Margin="0,2">
+                                                    <TextBlock Grid.Column="0" Classes="label" Text="Arguments" />
+                                                    <TextBox Grid.Column="1" Text="{Binding Arguments}" PlaceholderText="optional" />
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </StackPanel>
-                    </StackPanel>
-                </Border>
+                    </carbon:SettingsCardExpander>
 
-                <!-- Output -->
-                <Border Classes="card">
-                    <StackPanel>
-                        <TextBlock Classes="section" Text="Output" />
-                        <WrapPanel>
-                            <Grid Classes="field" ColumnDefinitions="150,*">
-                                <TextBlock Grid.Column="0" Classes="label" Text="Compression" />
-                                <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
-                                          ItemsSource="{Binding CompressionOptions}"
-                                          SelectedItem="{Binding Compression}" />
+                    <!-- Managed UI -->
+                    <carbon:SettingsCardExpander Header="Managed UI"
+                                                 Description="Customize the installer's dialog sequence"
+                                                 IconData="{pia:IconGeometry Icon=sliders_horizontal}"
+                                                 IsExpanded="False">
+                        <StackPanel>
+                            <CheckBox Content="Customize installer UI (otherwise the builder's default UI is used)"
+                                      IsChecked="{Binding UseCustomManagedUi}" />
+                            <StackPanel IsVisible="{Binding UseCustomManagedUi}" Margin="0,6,0,0">
+                                <Grid Classes="row" ColumnDefinitions="160,*">
+                                    <TextBlock Grid.Column="0" Classes="label" Text="UI dialog set (WUI)" />
+                                    <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                                              ItemsSource="{Binding WuiOptions}"
+                                              SelectedItem="{Binding SelectedWui}" />
+                                </Grid>
+                                <TextBlock Text="Install dialogs" FontWeight="SemiBold" Margin="0,8,0,2" />
+                                <ItemsControl ItemsSource="{Binding InstallDialogOptions}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:DialogSelectionViewModel">
+                                            <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsSelected}" Margin="0,0,12,0" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <TextBlock Text="Modify dialogs" FontWeight="SemiBold" Margin="0,8,0,2" />
+                                <ItemsControl ItemsSource="{Binding ModifyDialogOptions}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:DialogSelectionViewModel">
+                                            <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsSelected}" Margin="0,0,12,0" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </StackPanel>
+                    </carbon:SettingsCardExpander>
+
+                    <!-- Output -->
+                    <carbon:SettingsCardExpander Header="Output"
+                                                 Description="Compression, file name, and output folder"
+                                                 IconData="{pia:IconGeometry Icon=package}"
+                                                 IsExpanded="True">
+                        <StackPanel>
+                            <WrapPanel>
+                                <Grid Classes="field" ColumnDefinitions="150,*">
+                                    <TextBlock Grid.Column="0" Classes="label" Text="Compression" />
+                                    <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                                              ItemsSource="{Binding CompressionOptions}"
+                                              SelectedItem="{Binding Compression}" />
+                                </Grid>
+                                <Grid Classes="field" ColumnDefinitions="150,*">
+                                    <TextBlock Grid.Column="0" Classes="label" Text="MSI file name" />
+                                    <TextBox Grid.Column="1" Text="{Binding MsiFilename}" PlaceholderText="without path or extension" />
+                                </Grid>
+                            </WrapPanel>
+                            <Grid Classes="row" ColumnDefinitions="150,*,Auto">
+                                <TextBlock Grid.Column="0" Classes="label" Text="Output folder" />
+                                <TextBox Grid.Column="1" Text="{Binding OutputPath}" />
+                                <Button Grid.Column="2" Margin="6,0,0,0" Command="{Binding BrowseOutputPathCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <PathIcon Data="{pia:IconGeometry Icon=folder_open}" />
+                                        <TextBlock Text="Browse…" />
+                                    </StackPanel>
+                                </Button>
                             </Grid>
-                            <Grid Classes="field" ColumnDefinitions="150,*">
-                                <TextBlock Grid.Column="0" Classes="label" Text="MSI file name" />
-                                <TextBox Grid.Column="1" Text="{Binding MsiFilename}" PlaceholderText="without path or extension" />
-                            </Grid>
-                        </WrapPanel>
-                        <Grid Classes="row" ColumnDefinitions="150,*,Auto">
-                            <TextBlock Grid.Column="0" Classes="label" Text="Output folder" />
-                            <TextBox Grid.Column="1" Text="{Binding OutputPath}" />
-                            <Button Grid.Column="2" Content="Browse…" Margin="6,0,0,0" Command="{Binding BrowseOutputPathCommand}" />
-                        </Grid>
-                    </StackPanel>
-                </Border>
+                        </StackPanel>
+                    </carbon:SettingsCardExpander>
 
-            </StackPanel>
-        </ScrollViewer>
+                </StackPanel>
+            </ScrollViewer>
 
-    </DockPanel>
+        </DockPanel>
+
+        <!-- Carbon host control (overlays the window); wired in App.OnFrameworkInitializationCompleted -->
+        <infoBar:InfoBar x:Name="HostInfoBar" />
+    </Panel>
 </Window>

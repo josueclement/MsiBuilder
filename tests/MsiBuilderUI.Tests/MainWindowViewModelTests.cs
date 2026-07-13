@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Carbon.Avalonia.Desktop.Controls.InfoBar;
+using Carbon.Avalonia.Desktop.Services;
 using MsiBuilder.Contracts;
 using MsiBuilderUI.Services;
 using MsiBuilderUI.ViewModels;
@@ -14,11 +16,13 @@ public class MainWindowViewModelTests
     private static MainWindowViewModel CreateVm(
         IMsiBuildService? build = null,
         IStoragePickerService? picker = null,
-        IProfileService? profile = null)
+        IProfileService? profile = null,
+        IInfoBarService? infoBar = null)
         => new(
             build ?? Substitute.For<IMsiBuildService>(),
             picker ?? Substitute.For<IStoragePickerService>(),
-            profile ?? Substitute.For<IProfileService>());
+            profile ?? Substitute.For<IProfileService>(),
+            infoBar ?? Substitute.For<IInfoBarService>());
 
     [Fact]
     public void GenerateProductId_ProducesValidGuid()
@@ -144,6 +148,57 @@ public class MainWindowViewModelTests
         Assert.True(vm.LastBuildSucceeded);
         Assert.Contains("MyInstaller.msi", vm.StatusMessage);
         Assert.False(vm.IsBuilding);
+    }
+
+    [Fact]
+    public async Task Build_WhenValid_ShowsSuccessInfoBar()
+    {
+        IMsiBuildService build = Substitute.For<IMsiBuildService>();
+        build.BuildAsync(Arg.Any<MsiBuildRequest>(), Arg.Any<IProgress<string>>(), Arg.Any<CancellationToken>())
+             .Returns(Task.FromResult(new MsiBuildResult { Success = true, MsiPath = "C:\\out\\MyInstaller.msi" }));
+        IInfoBarService infoBar = Substitute.For<IInfoBarService>();
+        MainWindowViewModel vm = CreateVm(build, infoBar: infoBar);
+        SetValidRequiredFields(vm);
+
+        await vm.BuildCommand.ExecuteAsync(null);
+
+        Assert.True(vm.LastBuildSucceeded);
+        await infoBar.Received(1).ShowAsync(Arg.Any<Action<InfoBar>>());
+    }
+
+    [Fact]
+    public async Task Build_WhenServiceReportsFailure_ShowsErrorInfoBar()
+    {
+        IMsiBuildService build = Substitute.For<IMsiBuildService>();
+        build.BuildAsync(Arg.Any<MsiBuildRequest>(), Arg.Any<IProgress<string>>(), Arg.Any<CancellationToken>())
+             .Returns(Task.FromResult(new MsiBuildResult { Success = false, Message = "boom" }));
+        IInfoBarService infoBar = Substitute.For<IInfoBarService>();
+        MainWindowViewModel vm = CreateVm(build, infoBar: infoBar);
+        SetValidRequiredFields(vm);
+
+        await vm.BuildCommand.ExecuteAsync(null);
+
+        Assert.False(vm.LastBuildSucceeded);
+        await infoBar.Received(1).ShowAsync(Arg.Any<Action<InfoBar>>());
+    }
+
+    [Fact]
+    public async Task Build_DoesNotWaitForInfoBarDismissal()
+    {
+        IMsiBuildService build = Substitute.For<IMsiBuildService>();
+        build.BuildAsync(Arg.Any<MsiBuildRequest>(), Arg.Any<IProgress<string>>(), Arg.Any<CancellationToken>())
+             .Returns(Task.FromResult(new MsiBuildResult { Success = true, MsiPath = "C:\\out\\MyInstaller.msi" }));
+        IInfoBarService infoBar = Substitute.For<IInfoBarService>();
+        // Mirror the real Carbon InfoBar: ShowAsync completes only when the bar is dismissed.
+        infoBar.ShowAsync(Arg.Any<Action<InfoBar>>()).Returns(new TaskCompletionSource().Task);
+        MainWindowViewModel vm = CreateVm(build, infoBar: infoBar);
+        SetValidRequiredFields(vm);
+
+        await vm.BuildCommand.ExecuteAsync(null);
+
+        // The build must finish (spinner off, command re-enabled) without waiting for the notification.
+        Assert.False(vm.IsBuilding);
+        Assert.True(vm.LastBuildSucceeded);
     }
 
     private static void SetValidRequiredFields(MainWindowViewModel vm)
