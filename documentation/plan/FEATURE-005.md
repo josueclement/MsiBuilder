@@ -1,6 +1,6 @@
 # FEATURE-005 — Release MsiBuilderUI v1.0.0 (icon, metadata, MSI profile)
 
-**Status:** TODO
+**Status:** DONE
 
 Single-phase work item. Cuts the first branded, versioned release of the **MsiBuilderUI** desktop
 app using the `dotnet-release` skill's app path. Planned by `/interview`; implement with

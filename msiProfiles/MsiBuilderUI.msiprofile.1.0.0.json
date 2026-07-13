@@ -1,0 +1,30 @@
+{
+  "appName": "MsiBuilderUI",
+  "installPath": "%ProgramFiles%\\MsiBuilderUI",
+  "releasePath": "src\\MsiBuilderUI\\bin\\Release\\net10.0",
+  "scope": "PerMachine",
+  "version": "1.0.0",
+  "productId": "744B3EC3-6A5B-475A-9F83-E6F52B7D967C",
+  "upgradeCode": "02647720-D980-48A9-BD11-F017A9D1BE56",
+  "manufacturer": "Josué Clément",
+  "productIcon": "src\\MsiBuilderUI\\Assets\\MsiBuilderUI.ico",
+  "compression": "High",
+  "outputPath": "artifacts",
+  "msiFilename": "MsiBuilderUI",
+  "shortcuts": [
+    {
+      "shortcutPath": "%Desktop%",
+      "shortcutName": "MsiBuilderUI",
+      "targetPath": "[INSTALLDIR]\\MsiBuilderUI.exe",
+      "iconPath": "src\\MsiBuilderUI\\Assets\\MsiBuilderUI.ico",
+      "arguments": ""
+    },
+    {
+      "shortcutPath": "%ProgramMenu%",
+      "shortcutName": "MsiBuilderUI",
+      "targetPath": "[INSTALLDIR]\\MsiBuilderUI.exe",
+      "iconPath": "src\\MsiBuilderUI\\Assets\\MsiBuilderUI.ico",
+      "arguments": ""
+    }
+  ]
+}

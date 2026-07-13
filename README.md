@@ -4,6 +4,11 @@ Builder for creating Windows Installer (MSI) packages using WixSharp.
 
 Provides a fluent API for configuring and building MSI installers with various options.
 
+## Desktop application (MsiBuilderUI)
+
+This repository also ships **MsiBuilderUI**, an Avalonia desktop front-end for building MSI packages
+without writing code. See the release notes ([RELEASENOTES.md](RELEASENOTES.md)) for the latest app release.
+
 ## Install wix tool
 
 The wix tool is required to build MSI packages with this library.
